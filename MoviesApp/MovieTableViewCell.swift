@@ -31,9 +31,7 @@ class MovieTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.backgroundColor = .orange
-        addSubview(titleLabel)
-        addSubview(ratingLabel)
+        setUpView()
         setTitleConstraints()
     }
     
@@ -41,18 +39,16 @@ class MovieTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        titleLabel.text = nil
+    func setUpView() {
+        addSubview(titleLabel)
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        vstack.frame = CGRect(x:5, y:5, width: .infinity, height: contentView.frame.size.height-10)
+    func setUpConstraints() {
         
     }
     
-    func setData(movie:Movie) {
+    
+    func configure(with movie: Movie) {
         titleLabel.text = movie.title
         ratingLabel.text = String(movie.rating)
     }

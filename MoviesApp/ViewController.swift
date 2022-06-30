@@ -11,29 +11,19 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     private var movies: [Movie]?
     
-    lazy var moviesTableView: UITableView = {
+    private lazy var moviesTableView: UITableView = {
         let movies = UITableView()
         movies.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.identifier)
+        movies.translatesAutoresizingMaskIntoConstraints = false
         return movies
     }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Movies"
-        view.addSubview(moviesTableView)
-        moviesTableView.delegate = self
-        moviesTableView.dataSource = self
-        ApiService().fetchFilms{ [weak self] (movies) in
-            self?.movies = movies
-            DispatchQueue.main.async {
-                self?.moviesTableView.reloadData()
-            }
-        }
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        moviesTableView.frame = view.bounds
+        setUpView()
+        setUpConstraints()
+        loadMovies()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -44,17 +34,40 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableViewCell.identifier, for: indexPath) as? MovieTableViewCell else{
             return UITableViewCell()
         }
-        cell.setData(movie: movies![indexPath.row])
+        cell.configure(with: movies![indexPath.row])
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath:IndexPath) {
         moviesTableView.deselectRow(at: indexPath, animated: true)
         print("Tapped: \(movies?[indexPath.row].title ?? "" )")
+        self.navigationController?.pushViewController(DetailsViewController(movie: (movies![indexPath.row])), animated: false)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    @objc func navigate(sender: UITableView){
-        navigationController?.pushViewController(DetailsViewController(), animated: true)
+    
+    private func setUpView(){
+        view.addSubview(moviesTableView)
+        moviesTableView.delegate = self
+        moviesTableView.dataSource = self
+    }
+    
+    private func setUpConstraints() {
+        NSLayoutConstraint.activate([
+            moviesTableView.topAnchor.constraint(equalTo: view.topAnchor),
+            moviesTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            moviesTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            moviesTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    private func loadMovies(){
+        ApiService().fetchFilms{ [weak self] (movies) in
+            self?.movies = movies
+            DispatchQueue.main.async {
+                self?.moviesTableView.reloadData()
+            }
+        }
     }
 
 }

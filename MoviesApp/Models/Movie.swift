@@ -26,6 +26,6 @@ struct Movie: Decodable {
         case title = "original_title"
         case overview
         case rating = "vote_average"
-        case imageUrl = "poster_path"
+        case imageUrl = "backdrop_path"
     }
 }
